@@ -1,9 +1,9 @@
 raiz;{
     coordinates; favorited; truncated; created_at; at_created; id_str; 
     entity; entities; {
-        urls; [{ expanded_url; url; indices[]; display_url;}]
-        hashtags[];
-        user_mentions[];
+        urls; [{ expanded_url; url; indices;[] display_url;}]
+        hashtags;[]
+        user_mentions;[]
     }
     in_reply_to_user_id_str; text; retweet_count;
     in_reply_to_status_id_str; id; in_reply_to_user_id;
