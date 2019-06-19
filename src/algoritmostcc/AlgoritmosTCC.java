@@ -23,7 +23,7 @@ public class AlgoritmosTCC {
     public static void main(String[] args) {
         // TODO code application logic here
 
-        Implementa impl = new Implementa();
+        /*Implementa impl = new Implementa();
 
         int[][] matrizBloco = new int[][]{
             {1, 0, 0, 0, 0, 0},
@@ -36,7 +36,7 @@ public class AlgoritmosTCC {
         String[] palavrasConsolidadas = new String[]{"created_at", "at_created",
             "entity", "entities", "place", "spot"};
 
-        impl.consolidaEstruturaBloco(matrizBloco, palavrasConsolidadas);
+        impl.consolidaEstruturaBloco(matrizBloco, palavrasConsolidadas);*/
         
         AdaptarNotacaoAgregados adp = new AdaptarNotacaoAgregados();
         
