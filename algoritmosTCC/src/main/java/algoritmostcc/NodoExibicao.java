@@ -18,11 +18,11 @@ public class NodoExibicao {
     public static final String ZERO_UM = "0:1";
     public static final String ZERO_MUITOS = "0:N";
 
-    private String nome;
+    private final String nome;
     private boolean raiz;
-    private List<NodoExibicao> filhos;
-    private List<String> relacionamentos;
-    private List<String> atributos;
+    private final List<NodoExibicao> filhos;
+    private final List<String> relacionamentos;
+    private final List<String> atributos;
 
     public NodoExibicao(String nome) {
         this.nome = nome;

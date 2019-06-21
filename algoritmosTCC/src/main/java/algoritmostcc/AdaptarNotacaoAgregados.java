@@ -23,19 +23,11 @@ public class AdaptarNotacaoAgregados {
     private final static char FECHA_ARRAY_OBJ = '*';
     private final static char PALAVRA = '~';
 
-    private final static int EST_GERAL = 0;
-    private final static int EST_INI_ARR = 1;
-    private final static int EST_INI_ARR_OBJ = 2;
-    private final static int EST_FECHA_OBJ = 3;
-    private final static int EST_FECHA_ARR_OBJ = 4;
-
-    public final static String NADA = "%%";
     private final static int NODOS_ABERTOS = 0;
     private final static int NODOS_FECHADOS = 1;
 
     private boolean leituraPalavra;
     private final Stack<String> bufferPalavras;
-    private int estadoLeitura;
     private char bufferSimbolos;
     private StringBuilder palavraAtual;
     private final Stack[] pilha;
@@ -49,7 +41,6 @@ public class AdaptarNotacaoAgregados {
         nodoExibicao = null;
         palavraAtual = new StringBuilder();
         bufferPalavras = new Stack<>();
-        estadoLeitura = EST_GERAL;
     }
 
     public void lerCaractere(char c) {
@@ -96,11 +87,9 @@ public class AdaptarNotacaoAgregados {
                 palavraAtual.append(c);
                 break;
         }
-        //System.out.print(estadoLeitura);
     }
 
     private void adaptarNotacao(char simbolo) {
-        //System.out.print(simbolo);
         NodoExibicao novoNodo = null;
         switch (simbolo) {
             case FIM_PALAVRA:
