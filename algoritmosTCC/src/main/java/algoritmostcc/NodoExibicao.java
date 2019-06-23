@@ -14,7 +14,7 @@ import java.util.Objects;
  * @author ezequielrr
  */
 public class NodoExibicao {
-    
+
     public static final String ZERO_UM = "0:1";
     public static final String ZERO_MUITOS = "0:N";
 
@@ -39,6 +39,10 @@ public class NodoExibicao {
         return raiz;
     }
 
+    public List<NodoExibicao> getFilhos() {
+        return filhos;
+    }
+
     public List<String> getRelacionamentos() {
         return relacionamentos;
     }
@@ -46,11 +50,11 @@ public class NodoExibicao {
     public void setRaiz(boolean raiz) {
         this.raiz = raiz;
     }
-    
+
     public void addRelacionamento(String relacionamento) {
         this.relacionamentos.add(relacionamento);
     }
-    
+
     public void addFilho(NodoExibicao nodo) {
         filhos.add(nodo);
     }
@@ -58,7 +62,7 @@ public class NodoExibicao {
     public List<String> getAtributos() {
         return atributos;
     }
-    
+
     public void addAtributo(String atributo) {
         atributos.add(atributo);
     }
@@ -108,6 +112,5 @@ public class NodoExibicao {
         }
         return true;
     }
-    
-    
+
 }

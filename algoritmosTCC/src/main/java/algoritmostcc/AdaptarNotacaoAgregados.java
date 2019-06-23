@@ -5,7 +5,11 @@
  */
 package algoritmostcc;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -147,9 +151,60 @@ public class AdaptarNotacaoAgregados {
         }
     }
 
-    public NodoExibicao getNodoExibicao() {
-        nodoExibicao = (NodoExibicao) pilha[NODOS_FECHADOS].pop();
+    public NodoExibicao getNodoExibicao() throws Exception {
+        if (pilha[NODOS_ABERTOS].empty() && nodoExibicao == null) {
+            nodoExibicao = (NodoExibicao) pilha[NODOS_FECHADOS].pop();
+        } else {
+            if (!pilha[NODOS_ABERTOS].empty()) {
+                throw new Exception("Processo ainda não concluído!");
+            }
+        }
+
         return this.nodoExibicao;
+    }
+
+    private void criarListaJSONPath(NodoExibicao n, List<String> listaJsonPath,
+            List<String> listaBusca, String prefix) {
+        if (n == null) {
+            return;
+        }
+        String strJsonPath = prefix + "." + n.getNome();
+
+        listaJsonPath.add(strJsonPath);
+        listaBusca.add(n.getNome());
+        for (String attr : n.getAtributos()) {
+            if (!attr.equals("att")) {
+                listaBusca.add(attr);
+                listaJsonPath.add(strJsonPath + "." + attr);
+            }
+        }
+        for (NodoExibicao filho : n.getFilhos()) {
+            criarListaJSONPath(filho, listaJsonPath, listaBusca, strJsonPath);
+        }
+    }
+
+    public List<String> getListaJsonPath() {
+        List<String> jsonPath = new ArrayList<>();
+        List<String> busca = new ArrayList<>();
+        try {
+            criarListaJSONPath(getNodoExibicao(), jsonPath, busca, "$");
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            //Logger.getLogger(AdaptarNotacaoAgregados.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return jsonPath;
+    }
+
+    public List<String> getListaNomes() {
+        List<String> jsonPath = new ArrayList<>();
+        List<String> busca = new ArrayList<>();
+        try {
+            criarListaJSONPath(getNodoExibicao(), jsonPath, busca, "$");
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            //Logger.getLogger(AdaptarNotacaoAgregados.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return busca;
     }
 
 }

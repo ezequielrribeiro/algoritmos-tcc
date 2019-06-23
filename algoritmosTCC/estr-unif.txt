@@ -8,4 +8,5 @@ raiz;{
     in_reply_to_user_id_str; text; retweet_count;
     in_reply_to_status_id_str; id; in_reply_to_user_id;
     place; spot;
+    um_teste;
 }
