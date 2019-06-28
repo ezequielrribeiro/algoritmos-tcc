@@ -220,4 +220,10 @@ public class InfoJSON {
         return false;
     }
 
+    @Override
+    public String toString() {
+        return "InfoJSON{" + "f=" + f + ", fi=" + fi + ", parser=" + parser + ", nomeArquivo=" + nomeArquivo + '}';
+    }
+    
+    
 }

@@ -33,7 +33,8 @@ public class RemontarEstrutura {
         int i = 0;
         for (i = blocosCamposConsolidados.size() - 1; i >= 0; i--) {
             List<ElementoBloco> elementos = blocosCamposConsolidados.get(i);
-            for (ElementoBloco eb : elementos) {
+            for (int j = elementos.size() - 1; j >= 0; j--) {
+                ElementoBloco eb = elementos.get(j);
                 atualizaElementoBloco(eb, listaRef1);
                 if (eb.getTipo() == ElementoBloco.OBJETO
                         || eb.getTipo() == ElementoBloco.ARR_OBJETO) {
@@ -56,7 +57,7 @@ public class RemontarEstrutura {
             List<List<String>> listaRef1) {
 
         for (List<String> referencia : listaRef1) {
-            if (referencia.get(0).equals(elem.getNome())) {
+            if (referencia.get(0).equalsIgnoreCase(elem.getNome())) {
                 try {
                     InfoJSON info = new InfoJSON(referencia.get(1));
                     int tipo = info.getTipoElemento(elem.getNome());
@@ -84,6 +85,21 @@ public class RemontarEstrutura {
         }
     }
     
+    /**
+     * 
+     */
+    private int getTipoBloco(String nomeElem,
+            List<List<String>> listaRef1) throws FileNotFoundException, IOException {
+        for (List<String> referencia : listaRef1) {
+            if (referencia.get(0).equalsIgnoreCase(nomeElem)) {
+                InfoJSON info = new InfoJSON(referencia.get(1));
+                int tipo = info.getTipoElemento(nomeElem);
+                return tipo;
+            }
+        }
+        return -1;
+    }
+
     public String getStringArquivo() {
         return this.getStringArquivo(blocoPrincipal);
     }
@@ -97,11 +113,11 @@ public class RemontarEstrutura {
                         + e.getFechaDelimitador();
             } else {
                 str += e.getNome() + ";" + e.getAbreDelimitador()
-                        + getStringArquivo(e.getBlocoFilho()) 
+                        + getStringArquivo(e.getBlocoFilho())
                         + e.getFechaDelimitador();
             }
         }
         return str;
-    }   
+    }
 
 }
