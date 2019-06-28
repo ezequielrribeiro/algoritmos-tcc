@@ -28,7 +28,7 @@ public class RemontarEstrutura {
     }
 
     public void remontarPorBlocos(List<List<ElementoBloco>> blocosCamposConsolidados,
-            List<String[]> listaRef2, List<List<String>> listaRef1) {
+            List<String[]> listaRef2, List<List<String>> listaRef1) throws IOException {
 
         int i = 0;
         for (i = blocosCamposConsolidados.size() - 1; i >= 0; i--) {
@@ -54,39 +54,31 @@ public class RemontarEstrutura {
     }
 
     private void atualizaElementoBloco(ElementoBloco elem,
-            List<List<String>> listaRef1) {
-
-        for (List<String> referencia : listaRef1) {
-            if (referencia.get(0).equalsIgnoreCase(elem.getNome())) {
-                try {
-                    InfoJSON info = new InfoJSON(referencia.get(1));
-                    int tipo = info.getTipoElemento(elem.getNome());
-                    switch (tipo) {
-                        case InfoJSON.T_ARRAY:
-                            elem.setTipo(ElementoBloco.ARRAY);
-                            break;
-                        case InfoJSON.T_ARRAY_OBJETO:
-                            elem.setTipo(ElementoBloco.ARR_OBJETO);
-                            break;
-                        case InfoJSON.T_CAMPO:
-                            elem.setTipo(ElementoBloco.ATRIBUTO);
-                            break;
-                        case InfoJSON.T_OBJETO:
-                            elem.setTipo(ElementoBloco.OBJETO);
-                            break;
-                    }
-                } catch (FileNotFoundException ex) {
-                    System.out.println("Arquivo referenciado na lista de"
-                            + " referências 1 não encontrado");
-                } catch (IOException ex) {
-                    Logger.getLogger(RemontarEstrutura.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+            List<List<String>> listaRef1) throws IOException {
+        int tipoElemento = this.getTipoBloco(elem.getNome(), listaRef1);
+        switch (tipoElemento) {
+            case InfoJSON.T_ARRAY:
+                elem.setTipo(ElementoBloco.ARRAY);
+                break;
+            case InfoJSON.T_ARRAY_OBJETO:
+                elem.setTipo(ElementoBloco.ARR_OBJETO);
+                break;
+            case InfoJSON.T_CAMPO:
+                elem.setTipo(ElementoBloco.ATRIBUTO);
+                break;
+            case InfoJSON.T_OBJETO:
+                elem.setTipo(ElementoBloco.OBJETO);
+                break;
+            default:
+                // Fazer a busca na estrutura que representa as escolhas
+                // do especialista e descobrir o tipo do elemento em um dos
+                // documentos apontados(fazer)
+                break;
         }
     }
-    
+
     /**
-     * 
+     *
      */
     private int getTipoBloco(String nomeElem,
             List<List<String>> listaRef1) throws FileNotFoundException, IOException {
