@@ -5,6 +5,10 @@
  */
 package algoritmostcc;
 
+import model.ElementoBloco;
+import aux.InfoJSON;
+import dao.ListasDAO;
+import dao.estruturaConsolidadaDAO;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -20,22 +24,42 @@ import java.util.logging.Logger;
 public class RemontarEstrutura {
 
     private final Queue<List<ElementoBloco>> filaBlocos;
-    private List<ElementoBloco> blocoPrincipal;
 
     public RemontarEstrutura() {
         this.filaBlocos = new LinkedList<>();
-        this.blocoPrincipal = null;
     }
 
-    public void remontarPorBlocos(List<List<ElementoBloco>> blocosCamposConsolidados,
-            List<String[]> listaRef2, List<List<String>> listaRef1) throws IOException {
+    public void remontarPorBlocos() throws FileNotFoundException, IOException {
+        //Carrega os artefatos de entrada
+        ListasDAO l = new ListasDAO();
+        //Lista de referencias 1
+        List<List<String>> listaRef1 = l.lerListaReferencias1();
+        //Lista de referencias 2
+        List<String[]> listaRef2 = l.lerListaReferencias2();
+        //Configuracoes especialista
+        List<List<String>> listaEspecialista = l.lerListaEspecialista();
+        //Lista de campos consolidados
+        List<List<ElementoBloco>> blocosCamposConsolidados = l.lerListaCamposConsolidados();
 
-        int i = 0;
+        // Remonta a estrutura
+        List<ElementoBloco> blocoPrincipal = remontarPorBlocos(blocosCamposConsolidados, listaRef2, listaRef1, listaEspecialista);
+
+        // Grava a estrutura em arquivo, como estrutura consolidada
+        estruturaConsolidadaDAO est = new estruturaConsolidadaDAO();
+        est.gravarEstruturaConsolidada(blocoPrincipal);
+    }
+
+    private List<ElementoBloco> remontarPorBlocos(
+            List<List<ElementoBloco>> blocosCamposConsolidados,
+            List<String[]> listaRef2, List<List<String>> listaRef1,
+            List<List<String>> listaEspecialista) throws IOException {
+
+        int i;
         for (i = blocosCamposConsolidados.size() - 1; i >= 0; i--) {
             List<ElementoBloco> elementos = blocosCamposConsolidados.get(i);
             for (int j = elementos.size() - 1; j >= 0; j--) {
                 ElementoBloco eb = elementos.get(j);
-                atualizaElementoBloco(eb, listaRef1);
+                atualizaElementoBloco(eb, listaRef1, listaEspecialista, i);
                 if (eb.getTipo() == ElementoBloco.OBJETO
                         || eb.getTipo() == ElementoBloco.ARR_OBJETO) {
 
@@ -50,12 +74,19 @@ public class RemontarEstrutura {
             filaBlocos.add(elementos);
         }
         // Seta o primeiro nó como o raiz do objeto
-        this.blocoPrincipal = filaBlocos.poll();
+        return filaBlocos.poll();
     }
 
     private void atualizaElementoBloco(ElementoBloco elem,
-            List<List<String>> listaRef1) throws IOException {
+            List<List<String>> listaRef1, List<List<String>> especialista,
+            int numeroBloco) throws IOException {
+
         int tipoElemento = this.getTipoBloco(elem.getNome(), listaRef1);
+        if (tipoElemento == -1) {
+            tipoElemento = this.getTipoBlocoEspecialista(elem.getNome(),
+                    especialista, numeroBloco);
+        }
+
         switch (tipoElemento) {
             case InfoJSON.T_ARRAY:
                 elem.setTipo(ElementoBloco.ARRAY);
@@ -77,6 +108,21 @@ public class RemontarEstrutura {
         }
     }
 
+    private int getTipoBlocoEspecialista(String nomeElem,
+            List<List<String>> listaEspecialista, int numeroBloco)
+            throws FileNotFoundException, IOException {
+        int tipoDado = 0;
+        List<String> documentos = listaEspecialista.get(numeroBloco);
+        for (String documento : documentos) {
+            InfoJSON info = new InfoJSON(documento);
+            tipoDado = info.getTipoElemento(nomeElem);
+            if (tipoDado != InfoJSON.T_NADA) {
+                return tipoDado;
+            }
+        }
+        return -1;
+    }
+
     /**
      *
      */
@@ -90,10 +136,6 @@ public class RemontarEstrutura {
             }
         }
         return -1;
-    }
-
-    public String getStringArquivo() {
-        return this.getStringArquivo(blocoPrincipal);
     }
 
     private String getStringArquivo(List<ElementoBloco> elementos) {

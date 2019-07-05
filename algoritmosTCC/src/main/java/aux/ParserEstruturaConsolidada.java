@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package algoritmostcc;
+package aux;
 
+import model.NodoEstruturaConsolidada;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -12,10 +13,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Classe para carregar e interpretar a estrutura consolidada
+ * aplica as regras definidas, gerando uma árvore de n-filhos
+ * 
  * @author ezequielrr
  */
-public class AdaptarNotacaoAgregados {
+public class ParserEstruturaConsolidada {
 
     private final static char ESPACO = ' ';
     private final static char FIM_PALAVRA = ';';
@@ -35,10 +38,10 @@ public class AdaptarNotacaoAgregados {
     private char bufferSimbolos;
     private StringBuilder palavraAtual;
     private final Stack[] pilha;
-    private NodoExibicao nodoExibicao;
-    private NodoExibicao nodoAtual;
+    private NodoEstruturaConsolidada nodoExibicao;
+    private NodoEstruturaConsolidada nodoAtual;
 
-    public AdaptarNotacaoAgregados() {
+    public ParserEstruturaConsolidada() {
         pilha = new Stack[2];
         pilha[NODOS_ABERTOS] = new Stack<>();
         pilha[NODOS_FECHADOS] = new Stack<>();
@@ -94,22 +97,22 @@ public class AdaptarNotacaoAgregados {
     }
 
     private void adaptarNotacao(char simbolo) {
-        NodoExibicao novoNodo = null;
+        NodoEstruturaConsolidada novoNodo = null;
         switch (simbolo) {
             case FIM_PALAVRA:
                 if (bufferPalavras.empty()) {
-                    bufferPalavras.push(palavraAtual.toString());
+                    bufferPalavras.push(palavraAtual.toString().trim());
                 } else {
                     nodoAtual.addAtributo(bufferPalavras.pop());
-                    bufferPalavras.push(palavraAtual.toString());
+                    bufferPalavras.push(palavraAtual.toString().trim());
                 }
                 palavraAtual = new StringBuilder();
                 break;
             case INI_CLASSE:
-                novoNodo = new NodoExibicao(bufferPalavras.pop());
+                novoNodo = new NodoEstruturaConsolidada(bufferPalavras.pop());
                 if (nodoAtual != null) {
                     nodoAtual.addFilho(novoNodo);
-                    nodoAtual.addRelacionamento(NodoExibicao.ZERO_UM);
+                    nodoAtual.addRelacionamento(NodoEstruturaConsolidada.ZERO_UM);
                     pilha[NODOS_ABERTOS].push(nodoAtual);
                 } else {
                     novoNodo.setRaiz(true);
@@ -122,38 +125,38 @@ public class AdaptarNotacaoAgregados {
                 }
                 if (!pilha[NODOS_ABERTOS].empty()) {
                     pilha[NODOS_FECHADOS].push(nodoAtual);
-                    nodoAtual = (NodoExibicao) pilha[NODOS_ABERTOS].pop();
+                    nodoAtual = (NodoEstruturaConsolidada) pilha[NODOS_ABERTOS].pop();
                 } else {
                     pilha[NODOS_FECHADOS].push(nodoAtual);
                 }
                 break;
             case INI_ARRAY:
-                novoNodo = new NodoExibicao(bufferPalavras.pop());
+                novoNodo = new NodoEstruturaConsolidada(bufferPalavras.pop());
                 novoNodo.addAtributo("att");
                 nodoAtual.addFilho(novoNodo);
-                nodoAtual.addRelacionamento(NodoExibicao.ZERO_MUITOS);
+                nodoAtual.addRelacionamento(NodoEstruturaConsolidada.ZERO_MUITOS);
                 break;
             case FECHA_ARRAY:
                 break;
             case INI_ARRAY_OBJ:
-                novoNodo = new NodoExibicao(bufferPalavras.pop());
+                novoNodo = new NodoEstruturaConsolidada(bufferPalavras.pop());
                 nodoAtual.addFilho(novoNodo);
-                nodoAtual.addRelacionamento(NodoExibicao.ZERO_MUITOS);
+                nodoAtual.addRelacionamento(NodoEstruturaConsolidada.ZERO_MUITOS);
                 pilha[NODOS_ABERTOS].push(nodoAtual);
                 nodoAtual = novoNodo;
                 break;
             case FECHA_ARRAY_OBJ:
                 pilha[NODOS_FECHADOS].push(nodoAtual);
-                nodoAtual = (NodoExibicao) pilha[NODOS_ABERTOS].pop();
+                nodoAtual = (NodoEstruturaConsolidada) pilha[NODOS_ABERTOS].pop();
                 break;
             default:
                 break;
         }
     }
 
-    public NodoExibicao getNodoExibicao() throws Exception {
+    public NodoEstruturaConsolidada getNodoExibicao() throws Exception {
         if (pilha[NODOS_ABERTOS].empty() && nodoExibicao == null) {
-            nodoExibicao = (NodoExibicao) pilha[NODOS_FECHADOS].pop();
+            nodoExibicao = (NodoEstruturaConsolidada) pilha[NODOS_FECHADOS].pop();
         } else {
             if (!pilha[NODOS_ABERTOS].empty()) {
                 throw new Exception("Processo ainda não concluído!");
@@ -162,49 +165,4 @@ public class AdaptarNotacaoAgregados {
 
         return this.nodoExibicao;
     }
-
-    private void criarListaJSONPath(NodoExibicao n, List<String> listaJsonPath,
-            List<String> listaBusca, String prefix) {
-        if (n == null) {
-            return;
-        }
-        String strJsonPath = prefix + "." + n.getNome();
-
-        listaJsonPath.add(strJsonPath);
-        listaBusca.add(n.getNome());
-        for (String attr : n.getAtributos()) {
-            if (!attr.equals("att")) {
-                listaBusca.add(attr);
-                listaJsonPath.add(strJsonPath + "." + attr);
-            }
-        }
-        for (NodoExibicao filho : n.getFilhos()) {
-            criarListaJSONPath(filho, listaJsonPath, listaBusca, strJsonPath);
-        }
-    }
-
-    public List<String> getListaJsonPath() {
-        List<String> jsonPath = new ArrayList<>();
-        List<String> busca = new ArrayList<>();
-        try {
-            criarListaJSONPath(getNodoExibicao(), jsonPath, busca, "$");
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-            //Logger.getLogger(AdaptarNotacaoAgregados.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return jsonPath;
-    }
-
-    public List<String> getListaNomes() {
-        List<String> jsonPath = new ArrayList<>();
-        List<String> busca = new ArrayList<>();
-        try {
-            criarListaJSONPath(getNodoExibicao(), jsonPath, busca, "$");
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-            //Logger.getLogger(AdaptarNotacaoAgregados.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return busca;
-    }
-
 }
