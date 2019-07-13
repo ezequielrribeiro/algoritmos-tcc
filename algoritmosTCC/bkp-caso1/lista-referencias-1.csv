@@ -1,0 +1,30 @@
+Article;doc1.json
+Pages;doc1.json; doc3.json
+editor;doc2.json
+Issue;doc4.json
+Proceedings;doc2.json
+Year;doc1.json; doc2.json; doc3.json; doc4.json
+Booktitle;doc2.json; doc3.json
+Art no;doc4.json
+Inproceedings;doc3.json
+Volume;doc1.json; doc2.json; doc4.json
+Series;doc2.json
+Page start;doc4.json
+@key; doc1.json; doc2.json; doc3.json
+Journal;doc1.json
+Isbn;doc2.json
+Page end;doc4.json
+@mdate;doc1.json; doc2.json; doc3.json
+Number;doc1.json
+Crossref;doc3.json
+Page count;doc4.json
+author;doc1.json; doc3.json
+Ee;doc1.json; doc2.json; doc3.json
+Authors;doc4.json
+Cited by;doc4.json
+Title;doc1.json; doc2.json; doc3.json; doc4.json
+url;doc1.json; doc2.json; doc3.json
+Source title;doc4.json
+DOI;doc4.json
+Link;doc4.json
+EID;doc4.json

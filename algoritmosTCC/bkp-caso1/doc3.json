@@ -1,0 +1,20 @@
+{
+        "dblp": {
+                "inproceedings": {
+                        "@key": "conf/ACMse/ParkerPV13",
+                        "@mdate": "2015-05-07",
+                        "author": [
+                                "Zachary Parker",
+                                "Scott Poe",
+                                "Susan V. Vrbsky"
+                        ],
+                        "title": "Comparing NoSQL MongoDB to an SQL DB.",
+                        "pages": "5:1-5:6",
+                        "year": 2013,
+                        "booktitle": "ACM Southeast Regional Conference",
+                        "ee": "http://doi.acm.org/10.1145/2498328.2500047",
+                        "crossref": "conf/ACMse/2013",
+                        "url": "db/conf/ACMse/ACMse2013.html#ParkerPV13"
+                }
+        }
+}

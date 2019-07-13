@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package model;
+package model.estruturas;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +25,15 @@ public class ElementoBloco {
     private List<ElementoBloco> blocoFilho;
 
     public ElementoBloco() {
+        this.nome = "";
+        this.tipo = ATRIBUTO;
+        blocoFilho = new ArrayList<>(0);
     }
 
     public ElementoBloco(String nome, int tipo) {
         this.nome = nome;
         this.tipo = tipo;
-        this.blocoFilho = new ArrayList<>();
+        this.blocoFilho = new ArrayList<>(0);
     }
 
     public String getNome() {
@@ -116,8 +119,8 @@ public class ElementoBloco {
         if (this.tipo != other.tipo) {
             return false;
         }
-        if (!Objects.equals(this.nome, other.nome)) {
-            return false;
+        if(this.nome.equalsIgnoreCase(other.getNome())) {
+            return true;
         }
         if (!Objects.equals(this.blocoFilho, other.blocoFilho)) {
             return false;
@@ -127,6 +130,6 @@ public class ElementoBloco {
 
     @Override
     public String toString() {
-        return "ElementoBloco{" + "nome=" + nome + ", tipo=" + tipo + ", blocoFilho=" + blocoFilho + '}';
+        return "{" + "nome=" + nome + ", tipo=" + tipo + ", blocoFilho=\n\t" + blocoFilho + '}';
     }
 }

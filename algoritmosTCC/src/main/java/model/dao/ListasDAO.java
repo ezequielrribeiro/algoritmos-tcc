@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package dao;
+package model.dao;
 
-import model.ElementoBloco;
+import model.estruturas.ElementoBloco;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;

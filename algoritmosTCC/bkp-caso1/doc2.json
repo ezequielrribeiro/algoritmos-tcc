@@ -1,0 +1,27 @@
+{
+        "dblp": {
+                "proceedings": {
+                        "@key": "conf/naa/2016",
+                        "@mdate": "2017-04-13",
+                        "editor": [
+                                "Ivan Dimov",
+                                "István Faragó",
+                                "Lubin G. Vulkov"
+                        ],
+                        "title": "\nNumerical Analysis and Its Applications - 6th International Conference, NAA 2016, Lozenetz, Bulgaria, June 15-22, 2016, Revised Selected Papers\n",
+                        "booktitle": "NAA",
+                        "year": 2017,
+                        "series": {
+                                "@href": "db/journals/lncs.html",
+                                "$": "Lecture Notes in Computer Science"
+                        },
+                        "volume": 10187,
+                        "isbn": [
+                                "978-3-319-57098-3",
+                                "978-3-319-57099-0"
+                        ],
+                        "ee": "http://dx.doi.org/10.1007/978-3-319-57099-0",
+                        "url": "db/conf/naa/naa2016.html"
+                }
+        }
+}

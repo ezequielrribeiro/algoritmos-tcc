@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package dao;
+package model.dao;
 
-import aux.ParserEstruturaConsolidada;
-import model.ElementoBloco;
-import model.NodoEstruturaConsolidada;
+import model.aux.ParserEstruturaConsolidada;
+import model.estruturas.ElementoBloco;
+import model.estruturas.NodoEstruturaConsolidada;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author ezequielrr
  */
-public class estruturaConsolidadaDAO {
+public class EstruturaConsolidadaDAO {
     
     public NodoEstruturaConsolidada lerEstruturaConsolidada() 
             throws FileNotFoundException, IOException, Exception {
@@ -35,7 +35,7 @@ public class estruturaConsolidadaDAO {
         }
         lerArq.close();
         arq.close();
-        return notacoes.getNodoExibicao();
+        return notacoes.getNodoEstruturaConsolidada();
     }
 
     /**
@@ -50,7 +50,23 @@ public class estruturaConsolidadaDAO {
         gravarArq.close();
         arq.close();
     }
+    
+    public void gravarEstruturaConsolidada(ElementoBloco elemento) throws IOException {
+        FileWriter arq = new FileWriter("estrutura-consolidada.txt");
+        PrintWriter gravarArq = new PrintWriter(arq);
+        gravarArq.println(getStringEstruturaConsolidada(elemento));
+        gravarArq.close();
+        arq.close();
+    }
 
+    private String getStringEstruturaConsolidada(ElementoBloco elemento) {
+        String str = "";
+        str += "" + elemento.getNome() + ";" + elemento.getAbreDelimitador()
+                + getStringEstruturaConsolidada(elemento.getBlocoFilho())
+                + elemento.getFechaDelimitador() + "";
+        return str;
+    }
+    
     /**
      * Grava o esquema conceitual a partir da estrutura consolidada
      */

@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package algoritmostcc;
+package model;
 
-import model.NodoEstruturaConsolidada;
-import dao.ListasDAO;
-import dao.estruturaConsolidadaDAO;
+import model.estruturas.NodoEstruturaConsolidada;
+import model.dao.ListasDAO;
+import model.dao.EstruturaConsolidadaDAO;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class MontarMapeamentos {
 
     public void montarMapeamentos() throws FileNotFoundException, Exception {
         ListasDAO l = new ListasDAO();
-        estruturaConsolidadaDAO e = new estruturaConsolidadaDAO();
+        EstruturaConsolidadaDAO e = new EstruturaConsolidadaDAO();
         //Carrega os artefatos
         //Estrutura consolidada
         NodoEstruturaConsolidada estrCons = e.lerEstruturaConsolidada();
@@ -58,14 +58,9 @@ public class MontarMapeamentos {
             i++;
             List<String> termosEquivalentes = new ArrayList<>();
             obterTermosEquivalentes(elem, listaRef2, termosEquivalentes, fixados);
-            System.out.println(termosEquivalentes);
-            //fixados.addAll(termosEquivalentes);
 
             for (String termo : termosEquivalentes) {
-                //if (fixados.contains(termo)) continue;
                 List<String> docOrig = getDocOrigem(termo, listaRef1);
-                System.out.println(listaRef1);
-                System.out.println("t:"+termo+" d:"+docOrig);
                 for (String documentoOrig : docOrig) {
                     i = listaCamposConsolidados.indexOf(elem);
                     String[] dados = {listaJsonPathCamposConsolidados.get(i),

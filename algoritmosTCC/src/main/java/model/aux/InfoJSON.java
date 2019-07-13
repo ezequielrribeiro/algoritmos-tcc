@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package aux;
+package model.aux;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +20,7 @@ import static javax.json.stream.JsonParser.Event.KEY_NAME;
  * @author ezequielrr
  */
 public class InfoJSON {
-    
+
     public static final int T_CAMPO = 0;
     public static final int T_OBJETO = 1;
     public static final int T_ARRAY = 2;
@@ -57,6 +57,19 @@ public class InfoJSON {
         finaliza();
         init(nomeArquivo);
     }
+    
+    public int numeroBlocosDocumento() throws FileNotFoundException, IOException {
+        finaliza();
+        init(nomeArquivo);
+        int numBlocos = 0;
+        while(parser.hasNext()) {
+            Event evt  = parser.next();
+            if (evt == Event.START_OBJECT) {
+                numBlocos++;
+            }
+        }
+        return numBlocos;
+    }
 
     public void getJSONPathElemento(String elemento) {
 
@@ -81,6 +94,72 @@ public class InfoJSON {
         }
     }
     
+    public void caminhaArquivo() throws FileNotFoundException, IOException {
+        finaliza();
+        init(nomeArquivo);
+        while(parser.hasNext()) {
+            Event event = parser.next();
+            System.out.println(event);
+        }
+        finaliza();
+    }
+
+    /**
+     * Método para detectar casos onde o arquivo contém um objeto único
+     * localizado na raiz do documento JSON
+     */
+    public boolean temUnicoObjetoRaiz() throws FileNotFoundException, IOException {
+        finaliza();
+        init(nomeArquivo);
+        int nivel = 0;
+        if (parser.hasNext()) {
+            Event event = parser.next();
+            event = parser.next();
+            if (event == KEY_NAME) {
+                if (parser.hasNext()) {
+                    Event proxEv = parser.next();
+                    if (proxEv == Event.VALUE_STRING
+                            || proxEv == Event.VALUE_NUMBER
+                            || proxEv == Event.VALUE_FALSE
+                            || proxEv == Event.VALUE_NULL
+                            || proxEv == Event.VALUE_TRUE
+                            || proxEv == Event.START_ARRAY) {
+                        finaliza();
+                        return false;
+                    } else if (proxEv == Event.START_OBJECT) {
+                        nivel++;
+                        while (parser.hasNext()) {
+                            Event evt = parser.next();
+                            if (evt == Event.START_OBJECT) {
+                                nivel++;
+                            } else if (evt == Event.END_OBJECT) {
+                                nivel--;
+                            }
+                            if (nivel == 0) {
+                                proxEv = parser.next();
+                                break;
+                            }
+                        }
+                        if(nivel == 0 && proxEv == Event.END_OBJECT) {
+                            if (parser.hasNext()) {
+                                finaliza();
+                                return false;
+                            } else {
+                                finaliza();
+                                return true;
+                            }                            
+                        } else {
+                            finaliza();
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        finaliza();
+        return false;
+    }
+
     public int getTipoElemento(String nomeElemento) throws IOException {
         if (isCampo(nomeElemento)) {
             return T_CAMPO;
@@ -145,7 +224,7 @@ public class InfoJSON {
         finaliza();
         return false;
     }
-    
+
     public boolean isArrayObject(String elemento) throws
             FileNotFoundException, IOException {
         finaliza();
@@ -175,7 +254,6 @@ public class InfoJSON {
         finaliza();
         return false;
     }
-    
 
     public boolean isCampo(String elemento) throws
             FileNotFoundException, IOException {
@@ -210,7 +288,7 @@ public class InfoJSON {
         while (parser.hasNext()) {
             Event event = parser.next();
             if (event == KEY_NAME) {
-                if (parser.getString().equals(elemento)) {
+                if (parser.getString().equalsIgnoreCase(elemento)) {
                     finaliza();
                     return true;
                 }
@@ -224,6 +302,5 @@ public class InfoJSON {
     public String toString() {
         return "InfoJSON{" + "f=" + f + ", fi=" + fi + ", parser=" + parser + ", nomeArquivo=" + nomeArquivo + '}';
     }
-    
-    
+
 }

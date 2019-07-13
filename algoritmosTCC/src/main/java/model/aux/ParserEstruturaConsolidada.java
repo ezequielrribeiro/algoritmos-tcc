@@ -3,14 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package aux;
+package model.aux;
 
-import model.NodoEstruturaConsolidada;
-import java.util.ArrayList;
-import java.util.List;
+import model.estruturas.NodoEstruturaConsolidada;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Classe para carregar e interpretar a estrutura consolidada
@@ -154,7 +150,7 @@ public class ParserEstruturaConsolidada {
         }
     }
 
-    public NodoEstruturaConsolidada getNodoExibicao() throws Exception {
+    public NodoEstruturaConsolidada getNodoEstruturaConsolidada() throws Exception {
         if (pilha[NODOS_ABERTOS].empty() && nodoExibicao == null) {
             nodoExibicao = (NodoEstruturaConsolidada) pilha[NODOS_FECHADOS].pop();
         } else {

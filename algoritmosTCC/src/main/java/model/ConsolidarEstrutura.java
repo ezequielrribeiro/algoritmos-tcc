@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package algoritmostcc;
+package model;
 
-import model.MatrizResultados;
-import dao.ListasDAO;
-import dao.MatrizResultadosDAO;
+import model.estruturas.MatrizResultados;
+import model.dao.ListasDAO;
+import model.dao.MatrizResultadosDAO;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,8 +32,10 @@ public class ConsolidarEstrutura {
         for (MatrizResultados matrizBloco : matrizBlocos) {
             List<String> palavrasConsolidadasBloco = new ArrayList<>();
             List<String[]> listaReferencias2Bloco = new ArrayList<>();
+            
             consolidaEstruturaBloco(matrizBloco, listaReferencias2Bloco,
                     palavrasConsolidadasBloco);
+            
             palavrasConsolidadas.add(palavrasConsolidadasBloco);
             listaReferencias2.add(listaReferencias2Bloco);
         }

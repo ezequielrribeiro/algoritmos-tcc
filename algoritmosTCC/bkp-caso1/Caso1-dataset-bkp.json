@@ -1,0 +1,84 @@
+{
+"dblp": {
+"article": {
+"@key": "journals/ijbpim/AlmeidaBF15",
+        "@mdate": "2016-01-05",
+        "author": [
+                "Rafael Almeida",
+                "Jorge Bernardino",
+                "Pedro Furtado"
+        ],
+        "title": "\nTesting SQL and NoSQL approaches for big data warehouse systems.\n",
+        "pages": "322-334",
+        "year": 2015,
+        "volume": 7,
+        "journal": "IJBPIM",
+        "number": 4,
+        "ee": "http://dx.doi.org/10.1504/IJBPIM.2015.073656",
+        "url": "db/journals/ijbpim/ijbpim7.html#AlmeidaBF15"
+}
+}
+}
+{
+"dblp": {
+"proceedings": {
+"@key": "conf/naa/2016",
+        "@mdate": "2017-04-13",
+        "editor": [
+                "Ivan Dimov",
+                "István Faragó",
+                "Lubin G. Vulkov"
+        ],
+        "title": "\nNumerical Analysis and Its Applications - 6th International Conference, NAA 2016, Lozenetz, Bulgaria, June 15-22, 2016, Revised Selected Papers\n",
+        "booktitle": "NAA",
+        "year": 2017,
+        "series": {
+        "@href": "db/journals/lncs.html",
+                "$": "Lecture Notes in Computer Science"
+        },
+        "volume": 10187,
+        "isbn": [
+                "978-3-319-57098-3",
+                "978-3-319-57099-0"
+        ],
+        "ee": "http://dx.doi.org/10.1007/978-3-319-57099-0",
+        "url": "db/conf/naa/naa2016.html"
+}
+}
+}
+{
+"dblp": {
+"inproceedings": {
+"@key": "conf/ACMse/ParkerPV13",
+        "@mdate": "2015-05-07",
+        "author": [
+                "Zachary Parker",
+                "Scott Poe",
+                "Susan V. Vrbsky"
+        ],
+        "title": "Comparing NoSQL MongoDB to an SQL DB.",
+        "pages": "5:1-5:6",
+        "year": 2013,
+        "booktitle": "ACM Southeast Regional Conference",
+        "ee": "http://doi.acm.org/10.1145/2498328.2500047",
+        "crossref": "conf/ACMse/2013",
+        "url": "db/conf/ACMse/ACMse2013.html#ParkerPV13"
+}
+}
+}
+{
+"Authors": "González-Aparicio M.T., Ogunyadeka A., Younas M., Tuya J., Casado R.",
+        "Title": "Transaction processing in consistency-aware user’s applications deployed on NoSQL databases",
+        "Year": 2017,
+        "Source title": "Human-centric Computing and Information Sciences",
+        "Volume": 7,
+        "Issue": 1,
+        "Art. No.": 7,
+        "Page start": "",
+        "Page end": "",
+        "Page count": "",
+        "Cited by": "",
+        "DOI": "10.1186/s13673-017-0088-3",
+        "Link": "https://www.scopus.com/inward/record.uri?eid=2-s2.0-85017092398&doi=10.1186%2fs13673-017-0088-3&partnerID=40&md5=428fd7f4ac78b0e500e305981b9d17a5",
+        "EID": "2-s2.0-85017092398"
+}
