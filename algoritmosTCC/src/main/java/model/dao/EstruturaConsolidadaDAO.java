@@ -61,7 +61,13 @@ public class EstruturaConsolidadaDAO {
 
     private String getStringEstruturaConsolidada(ElementoBloco elemento) {
         String str = "";
-        str += "" + elemento.getNome() + ";" + elemento.getAbreDelimitador()
+        String escNome = "";
+            if (elemento.getNomeConsolidado() != null && !elemento.getNomeConsolidado().equals("")) {
+                escNome = elemento.getNomeConsolidado();
+            } else {
+                escNome = elemento.getNome();
+            }
+        str += "" + escNome + ";" + elemento.getAbreDelimitador()
                 + getStringEstruturaConsolidada(elemento.getBlocoFilho())
                 + elemento.getFechaDelimitador() + "";
         return str;
@@ -85,13 +91,19 @@ public class EstruturaConsolidadaDAO {
      */
     private String getStringEstruturaConsolidada(List<ElementoBloco> elementos) {
         String str = "";
+        String escNome = "";
         for (ElementoBloco e : elementos) {
+            if (e.getNomeConsolidado() != null && !e.getNomeConsolidado().equals("")) {
+                escNome = e.getNomeConsolidado();
+            } else {
+                escNome = e.getNome();
+            }
             if (e.getTipo() != ElementoBloco.OBJETO && e.getTipo()
                     != ElementoBloco.ARR_OBJETO) {
-                str += e.getNome() + ";" + e.getAbreDelimitador()
+                str += escNome + ";" + e.getAbreDelimitador()
                         + e.getFechaDelimitador();
             } else {
-                str += e.getNome() + ";" + e.getAbreDelimitador()
+                str += escNome + ";" + e.getAbreDelimitador()
                         + getStringEstruturaConsolidada(e.getBlocoFilho())
                         + e.getFechaDelimitador();
             }

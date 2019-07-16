@@ -21,11 +21,13 @@ public class ElementoBloco {
     public final static int ARRAY = 3;
 
     private String nome;
+    private String nomeConsolidado;
     private int tipo;
     private List<ElementoBloco> blocoFilho;
 
     public ElementoBloco() {
         this.nome = "";
+        this.nomeConsolidado = "";
         this.tipo = ATRIBUTO;
         blocoFilho = new ArrayList<>(0);
     }
@@ -63,6 +65,18 @@ public class ElementoBloco {
     public void addBlocoFilho(ElementoBloco elem) {
         this.blocoFilho.add(elem);
     }
+    
+    public void apagaBlocoFilho(ElementoBloco elem) {
+        this.blocoFilho.remove(elem);
+    }
+
+    public String getNomeConsolidado() {
+        return nomeConsolidado;
+    }
+
+    public void setNomeConsolidado(String nomeConsolidado) {
+        this.nomeConsolidado = nomeConsolidado;
+    }
 
     public String getAbreDelimitador() {
         switch (this.tipo) {
@@ -94,13 +108,13 @@ public class ElementoBloco {
         }
     }
 
-    
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 47 * hash + Objects.hashCode(this.nome);
-        hash = 47 * hash + this.tipo;
-        hash = 47 * hash + Objects.hashCode(this.blocoFilho);
+        int hash = 7;
+        hash = 59 * hash + Objects.hashCode(this.nome);
+        hash = 59 * hash + Objects.hashCode(this.nomeConsolidado);
+        hash = 59 * hash + this.tipo;
+        hash = 59 * hash + Objects.hashCode(this.blocoFilho);
         return hash;
     }
 
@@ -119,8 +133,11 @@ public class ElementoBloco {
         if (this.tipo != other.tipo) {
             return false;
         }
-        if(this.nome.equalsIgnoreCase(other.getNome())) {
-            return true;
+        if (!Objects.equals(this.nome, other.nome)) {
+            return false;
+        }
+        if (!Objects.equals(this.nomeConsolidado, other.nomeConsolidado)) {
+            return false;
         }
         if (!Objects.equals(this.blocoFilho, other.blocoFilho)) {
             return false;
@@ -130,6 +147,7 @@ public class ElementoBloco {
 
     @Override
     public String toString() {
-        return "{" + "nome=" + nome + ", tipo=" + tipo + ", blocoFilho=\n\t" + blocoFilho + '}';
+        return "ElementoBloco{" + "nome=" + nome + ", nomeConsolidado=" + nomeConsolidado + ", tipo=" + tipo + ",\n blocoFilho=" + blocoFilho + '}';
     }
+
 }

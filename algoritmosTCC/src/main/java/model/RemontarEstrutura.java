@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Stack;
 import javax.json.Json;
 import javax.json.stream.JsonParser;
@@ -57,25 +58,18 @@ public class RemontarEstrutura {
                 evt = parser.next();
                 if (evt == Event.KEY_NAME) {
                     raiz.setNome(parser.getString());
-                    /*Posicionando o ponteiro no '{' que vem depois do nome do 
-                     * objeto raiz */
-                    evt = parser.next();
+                    parser.close();
+                    fi.close();
                     break;
                 }
             }
-            // Chama a função recursiva para formar a árvore 
-            // a partir da raiz dada
-            montaArvore(raiz, parser, listaReferencias2, listaConsolidada, visitados);
+            montaArvore(raiz, listaReferencias2, listaConsolidada, info, visitados);
         } else {
-            File f = new File(arquivo);
-            FileInputStream fi = new FileInputStream(f);
-            JsonParser parser = Json.createParser(fi);
-            /* Posicionando o ponteiro no '{' da raiz do documento */
-            parser.next();
             // Chama a função recursiva para formar a árvore 
             // a partir da raiz dada
-            montaArvore(raiz, parser, listaReferencias2, listaConsolidada, visitados);
+            montaArvore(raiz, listaReferencias2, listaConsolidada, info, visitados);
         }
+        //System.out.println(info.getPalavrasObjetoArray("Author"));
         e.gravarEstruturaConsolidada(raiz);
     }
 
@@ -124,93 +118,221 @@ public class RemontarEstrutura {
     }
 
     /**
-     * Método auxiliar recursivo para remontar a estrutura do JSON segundo um
-     * único bloco
+     * Método auxiliar para remontar a estrutura do JSON segundo um único bloco
      */
-    private void montaArvore(ElementoBloco elementoAtual, JsonParser parser,
+    private void montaArvore(ElementoBloco raiz,
             List<String[]> listaReferencias2,
-            List<List<ElementoBloco>> listaConsolidada, List<String> visitados) {
-        String nomeTemp = "";
+            List<List<ElementoBloco>> listaConsolidada,
+            InfoJSON infoDocOrigem,
+            List<String> visitadosConsolidados) throws IOException {
 
-        // Adicionar os itens pertencentes ao nodo raiz em questão 
-        //(objetos, tudo)
-        while (parser.hasNext()) {
-            Event evento = parser.next();
-            // Fim do objeto, retorna
-            if (evento == Event.END_OBJECT) {
-                //Diferenciar o fechamento de objeto normal de objeto
-                //aninhado em um array
-                if (elementoAtual.getTipo() == ElementoBloco.OBJETO) {
-                    if(elementoAtual.getBlocoFilho().isEmpty()) {
-                        elementoAtual.setTipo(ElementoBloco.ATRIBUTO);
-                    }
-                    return;
-                } else if (elementoAtual.getTipo() == ElementoBloco.ARR_OBJETO) {
-                    evento = parser.next();
-                    if (evento == Event.END_ARRAY) {
-                        return;
-                    }
+        Stack<ElementoBloco> pilhaAbertos = new Stack<>();
+        Stack<ElementoBloco> pilhaFechados = new Stack<>();
+        ElementoBloco atual = raiz;
+        List<String> palavrasDoArquivo = infoDocOrigem.getPalavrasArquivo();
+        List<ElementoBloco[]> avaliar = new ArrayList<>();
+
+        for (String palavra : palavrasDoArquivo) {
+            // Para "pular" o nodo raiz
+            if (palavra.equalsIgnoreCase(raiz.getNome())) {
+                continue;
+            }
+            String tPalavra = getTermoConsolidado(palavra, listaConsolidada, listaReferencias2);
+
+            //Adiciona os objetos
+            if (infoDocOrigem.getTipoElemento(palavra) == InfoJSON.T_OBJETO) {
+                List<String> lp = new ArrayList<>();
+                if (atual.getTipo() == ElementoBloco.OBJETO) {
+                    lp = infoDocOrigem.getPalavrasObjeto(atual.getNome());
+                } else if (atual.getTipo() == ElementoBloco.ARR_OBJETO) {
+                    lp = infoDocOrigem.getPalavrasObjetoArray(atual.getNome());
                 }
-            } else if (evento == Event.END_ARRAY && elementoAtual.getTipo()
-                    == ElementoBloco.ARR_OBJETO) {
-                return;
-            } else if (evento == Event.KEY_NAME) {
-                // Encontrou um nome, mas não se sabe o que ele faz ainda
-                nomeTemp = parser.getString();
-                if (!estaNaListaConsolidada(nomeTemp, listaConsolidada)) {
-                    String nomeT = obterTermoEquivalente(nomeTemp, listaReferencias2);
-                    nomeTemp = nomeT;
-                }
-            } else if (evento == Event.VALUE_STRING
-                    || evento == Event.VALUE_NUMBER
-                    || evento == Event.VALUE_FALSE
-                    || evento == Event.VALUE_NULL
-                    || evento == Event.VALUE_TRUE) {
-                // Encontrou um atributo, apenas adiciona
-                // se ele já não tiver sido visitado anteriormente
-                if (!estaNaLista(nomeTemp, visitados)) {
-                    ElementoBloco novo = new ElementoBloco(nomeTemp,
-                            ElementoBloco.ATRIBUTO);
-                    //Adicionar depois regras (buscar na lista de consolidados e visitados)
-                    elementoAtual.addBlocoFilho(novo);
-                    visitados.add(nomeTemp);
-                }
-            } else if (evento == Event.START_ARRAY) {
-                // Caso encontre um array, 2 casos:
-                if (parser.hasNext()) {
-                    evento = parser.next();
-                    // 1-array simples
-                    if (evento != Event.START_OBJECT) {
-                        ElementoBloco novo = new ElementoBloco(nomeTemp,
-                                ElementoBloco.ARRAY);
-                        elementoAtual.addBlocoFilho(novo);
+                ElementoBloco novo = new ElementoBloco(palavra, ElementoBloco.OBJETO);
+                novo.setNomeConsolidado(tPalavra);
+                if (estaNaLista(palavra, lp)) {
+                    atual.addBlocoFilho(novo);
+                    // Adiciona palavra ao histórico de nodos visitados
+                    if (!estaNaLista(tPalavra, visitadosConsolidados)) {
+                        visitadosConsolidados.add(tPalavra);
                     } else {
-                        // 2-array de objetos
-                        if (!estaNaLista(nomeTemp, visitados)) {
-                            visitados.add(nomeTemp);
+                        // Caso a palavra já tenha sido usada, marca o nodo para
+                        // numa futura varredura avaliar se exclui o nodo ou mantém
+                        // ("sem nome"), numa estrutura que contém o
+                        // nodo a ser avaliado e seu "pai"
+                        ElementoBloco[] avalia = {atual, novo};
+                        avaliar.add(avalia);
+                    }
+                } else {
+                    //Verifica antes se o objeto atual não tem atributos
+                    // Caso este não tenha, é alterado para Atributo antes de
+                    // Ser "descartado"
+                    if (atual.getBlocoFilho().isEmpty()) {
+                        atual.setTipo(ElementoBloco.ATRIBUTO);
+                    }
+                    // Vai descendo de nivel ate encontrar o nivel
+                    // que contenha o elemento
+                    while (!pilhaAbertos.empty()) {
+                        // "Descarta" o nodo recém setado como atributo
+                        if (atual.getTipo() != ElementoBloco.ATRIBUTO) {
+                            pilhaFechados.push(atual);
                         }
-                        ElementoBloco novo = new ElementoBloco(nomeTemp,
-                                ElementoBloco.ARR_OBJETO);
-                        elementoAtual.addBlocoFilho(novo);
-                        montaArvore(novo, parser, listaReferencias2,
-                                listaConsolidada, visitados);
+                        atual = pilhaAbertos.pop();
+                        if (atual.getTipo() == ElementoBloco.OBJETO) {
+                            lp = infoDocOrigem.getPalavrasObjeto(atual.getNome());
+                        } else if (atual.getTipo() == ElementoBloco.ARR_OBJETO) {
+                            lp = infoDocOrigem.getPalavrasObjetoArray(atual.getNome());
+                        }
+                        if (estaNaLista(palavra, lp)) {
+                            atual.addBlocoFilho(novo);
+                            // Adiciona palavra ao histórico de nodos visitados
+                            if (!estaNaLista(tPalavra, visitadosConsolidados)) {
+                                visitadosConsolidados.add(tPalavra);
+                            } else {
+                                // Caso a palavra já tenha sido usada, marca o nodo para
+                                // numa futura varredura avaliar se exclui o nodo ou mantém
+                                // ("sem nome"), numa estrutura que contém o
+                                // nodo a ser avaliado e seu "pai"
+                                ElementoBloco[] avalia = {atual, novo};
+                                avaliar.add(avalia);
+                            }
+                            break;
+                        }
                     }
                 }
-            } else if (evento == Event.START_OBJECT) {
-                // Encontrou um objeto filho
-                ElementoBloco novo = new ElementoBloco(nomeTemp, ElementoBloco.OBJETO);
-                elementoAtual.addBlocoFilho(novo);
-                montaArvore(novo, parser, listaReferencias2,
-                        listaConsolidada, visitados);
-                if (!estaNaLista(nomeTemp, visitados)) {
-                    visitados.add(nomeTemp);
+                // Deve empilhar o objeto pai na pilha de abertos
+                // Setar como atual o novo objeto
+                pilhaAbertos.push(atual);
+                atual = novo;
+            } else if (infoDocOrigem.getTipoElemento(palavra) == InfoJSON.T_ARRAY_OBJETO) {
+                List<String> lp = new ArrayList<>();
+                if (atual.getTipo() == ElementoBloco.OBJETO) {
+                    lp = infoDocOrigem.getPalavrasObjeto(atual.getNome());
+                } else if (atual.getTipo() == ElementoBloco.ARR_OBJETO) {
+                    lp = infoDocOrigem.getPalavrasObjetoArray(atual.getNome());
+                }
+                ElementoBloco novo = new ElementoBloco(palavra, ElementoBloco.ARR_OBJETO);
+                novo.setNomeConsolidado(tPalavra);
+                if (estaNaLista(palavra, lp)) {
+                    atual.addBlocoFilho(novo);
+                    // Adiciona palavra ao histórico de nodos visitados
+                    if (!estaNaLista(tPalavra, visitadosConsolidados)) {
+                        visitadosConsolidados.add(tPalavra);
+                    }
                 } else {
-                    if(novo.getBlocoFilho().isEmpty()) {
-                        elementoAtual.getBlocoFilho().remove(novo);
+                    //Verifica antes se o objeto atual não tem atributos
+                    // Caso este não tenha, é alterado para Atributo antes de
+                    // Ser "descartado"
+                    if (atual.getBlocoFilho().isEmpty()) {
+                        atual.setTipo(ElementoBloco.ATRIBUTO);
+                    }
+
+                    // Vai descendo de nivel ate encontrar o nivel
+                    // que contenha o elemento
+                    while (!pilhaAbertos.empty()) {
+                        // "Descarta" o nodo recém setado como atributo
+                        if (atual.getTipo() != ElementoBloco.ATRIBUTO) {
+                            pilhaFechados.push(atual);
+                        }
+                        atual = pilhaAbertos.pop();
+                        if (atual.getTipo() == ElementoBloco.OBJETO) {
+                            lp = infoDocOrigem.getPalavrasObjeto(atual.getNome());
+                        } else if (atual.getTipo() == ElementoBloco.ARR_OBJETO) {
+                            lp = infoDocOrigem.getPalavrasObjetoArray(atual.getNome());
+                        }
+                        if (estaNaLista(palavra, lp)) {
+                            atual.addBlocoFilho(novo);
+                            // Adiciona palavra ao histórico de nodos visitados
+                            if (!estaNaLista(tPalavra, visitadosConsolidados)) {
+                                visitadosConsolidados.add(tPalavra);
+                            }
+
+                            break;
+                        }
+                    }
+                }
+                // Deve empilhar o objeto pai na pilha de abertos
+                // Setar como atual o novo objeto
+                pilhaAbertos.push(atual);
+                atual = novo;
+            } else if (infoDocOrigem.getTipoElemento(palavra) == InfoJSON.T_CAMPO) {
+                if (estaNaLista(tPalavra, visitadosConsolidados)) {
+                    continue;
+                }
+                List<String> lp = new ArrayList<>();
+                if (atual.getTipo() == ElementoBloco.OBJETO) {
+                    lp = infoDocOrigem.getPalavrasObjeto(atual.getNome());
+                } else if (atual.getTipo() == ElementoBloco.ARR_OBJETO) {
+                    lp = infoDocOrigem.getPalavrasObjetoArray(atual.getNome());
+                }
+                ElementoBloco novo = new ElementoBloco(palavra, ElementoBloco.ATRIBUTO);
+                novo.setNomeConsolidado(tPalavra);
+                if (estaNaLista(palavra, lp)) {
+                    if (!estaNaLista(tPalavra, visitadosConsolidados)) {
+                        atual.addBlocoFilho(novo);
+                        visitadosConsolidados.add(tPalavra);
+                    }
+                } else {
+                    //Verifica antes se o objeto atual não tem atributos
+                    // Caso este não tenha, é alterado para Atributo antes de
+                    // Ser "descartado"
+                    if (atual.getBlocoFilho().isEmpty()) {
+                        atual.setTipo(ElementoBloco.ATRIBUTO);
+                    }
+
+                    // Vai descendo de nivel ate encontrar o nivel
+                    // que contenha o elemento
+                    while (!pilhaAbertos.empty()) {
+                        // "Descarta" o nodo recém setado como atributo
+                        if (atual.getTipo() != ElementoBloco.ATRIBUTO) {
+                            pilhaFechados.push(atual);
+                        }
+
+                        atual = pilhaAbertos.pop();
+                        if (atual.getTipo() == ElementoBloco.OBJETO) {
+                            lp = infoDocOrigem.getPalavrasObjeto(atual.getNome());
+                        } else if (atual.getTipo() == ElementoBloco.ARR_OBJETO) {
+                            lp = infoDocOrigem.getPalavrasObjetoArray(atual.getNome());
+                        }
+                        if (estaNaLista(palavra, lp)) {
+                            atual.addBlocoFilho(novo);
+                            visitadosConsolidados.add(tPalavra);
+                            break;
+                        }
                     }
                 }
             }
         }
+
+        // É feita uma varredura final
+        for (ElementoBloco[] eb : avaliar) {
+            // remover os nodos excedentes (convertidos em atributos mas são
+            // repetidos
+            if(eb[1].getTipo() == ElementoBloco.ATRIBUTO) {
+                eb[0].apagaBlocoFilho(eb[1]);
+            } else if(eb[1].getNomeConsolidado().equalsIgnoreCase(eb[0].getNomeConsolidado())) {
+                // filhos com o mesmo nome do pai
+                // Transferência para o pai dos filhos do filho
+                List<ElementoBloco> tFilhos = eb[1].getBlocoFilho();
+                List<ElementoBloco> tPai = eb[0].getBlocoFilho();
+                tPai.addAll(tFilhos);
+                //apagar o filho
+                eb[0].apagaBlocoFilho(eb[1]);
+            } else {
+                // renomear os casos de filhos que tenham filhos consolidados
+                Random gera = new Random();
+                eb[1].setNomeConsolidado("e_"+gera.nextInt());
+            }
+        }
+    }
+
+    private String getTermoConsolidado(String entrada,
+            List<List<ElementoBloco>> listaConsolidada,
+            List<String[]> listaReferencias2) {
+        if (!estaNaListaConsolidada(entrada, listaConsolidada)) {
+            String nomeT = obterTermoEquivalente(entrada, listaReferencias2);
+            return nomeT;
+        }
+        return entrada;
     }
 
     /**

@@ -32,10 +32,11 @@ public class ConsolidarEstrutura {
         for (MatrizResultados matrizBloco : matrizBlocos) {
             List<String> palavrasConsolidadasBloco = new ArrayList<>();
             List<String[]> listaReferencias2Bloco = new ArrayList<>();
-            
+
+            // Executa o algoritmo de consolidação de estrutura
             consolidaEstruturaBloco(matrizBloco, listaReferencias2Bloco,
                     palavrasConsolidadasBloco);
-            
+
             palavrasConsolidadas.add(palavrasConsolidadasBloco);
             listaReferencias2.add(listaReferencias2Bloco);
         }
@@ -48,7 +49,7 @@ public class ConsolidarEstrutura {
             }
         }
 
-        //Grava em arquivo os artefatos:
+        //Grava em arquivos os artefatos:
         //lista de referências 2 e campos consolidados
         ListasDAO l = new ListasDAO();
         l.gravarListaCamposConsolidados(palavrasConsolidadas);

@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.json.Json;
 import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
@@ -280,6 +282,131 @@ public class InfoJSON {
         finaliza();
         return false;
     }
+    
+    /**
+     * Método que lista todos os nomes de elementos do arquivo
+     * (atributos, objetos, arrays)
+     * @return Lista com nomes de elementos
+     * @throws java.io.IOException
+     */
+    public List<String> getPalavrasArquivo() throws IOException {
+        List<String> listaPalavrasDoc = new ArrayList<>(0);
+        finaliza();
+        init(nomeArquivo);
+        while (parser.hasNext()) {
+            Event event = parser.next();
+            if (event == KEY_NAME) {
+                listaPalavrasDoc.add(parser.getString());
+            }
+        }
+        finaliza();
+        return listaPalavrasDoc;
+    }
+    
+    /**
+     * Método para listar todos os itens pertencentes a um array de objetos
+     * trata todos os elementos dos diferentes objetos juntos, ou seja, lista 
+     * todos os elementos de todas as posições do array, gerando uma lista com
+     * repetições de nomes
+     */
+    public List<String> getPalavrasObjetoArray(String nomeObjeto) throws IOException {
+        List<String> listaPalavrasObj = new ArrayList<>(0);
+        finaliza();
+        init(nomeArquivo);
+        int nivel = 0;
+        while (parser.hasNext()) {
+            Event event = parser.next();
+            if (event == KEY_NAME) {
+                // Se o nome conferir com o nome de objeto procurado
+                if(parser.getString().equalsIgnoreCase(nomeObjeto)) {
+                    event = parser.next();
+                    if(event == Event.START_ARRAY) {
+                        event = parser.next();
+                        if(event == Event.START_OBJECT) {
+                            while (parser.hasNext()) {
+                                event = parser.next();
+                                // Se encontrar outro objeto aninhado, eleva o nível
+                                if(event == Event.START_OBJECT) {
+                                    nivel++;
+                                } else if (event == KEY_NAME) {
+                                    // Adiciona apenas as palavras pertencentes
+                                    // ao mesmo nível do objeto (nivel == 0)
+                                    if(nivel == 0) {
+                                        listaPalavrasObj.add(parser.getString());
+                                    }
+                                } else if (event == Event.END_OBJECT) {
+                                    //Encerra apenas se for o fim do nível
+                                    if (nivel == 0) {
+                                        event = parser.next();
+                                        if(event == Event.END_ARRAY) {
+                                            finaliza();
+                                            return listaPalavrasObj;
+                                        } else if (event == Event.START_OBJECT) {
+                                            continue;
+                                        }
+                                    } else {
+                                        // Senão, reduz a variável e segue
+                                        // a leitura
+                                        nivel--;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Lista o nome de todos elementos que pertençam a um objeto
+     */
+    public List<String> getPalavrasObjeto(String nomeObjeto) throws IOException {
+        List<String> listaPalavrasObj = new ArrayList<>(0);
+        finaliza();
+        init(nomeArquivo);
+        int nivel = 0;
+        while (parser.hasNext()) {
+            Event event = parser.next();
+            if (event == KEY_NAME) {
+                // Se o nome conferir com o nome de objeto procurado
+                if(parser.getString().equalsIgnoreCase(nomeObjeto)) {
+                    event = parser.next();
+                    // Se for um objeto
+                    if (event == Event.START_OBJECT) {
+                        while (parser.hasNext()) {
+                            event = parser.next();
+                            // Se encontrar outro objeto aninhado, eleva o nível
+                            if(event == Event.START_OBJECT) {
+                                nivel++;
+                            } else if (event == KEY_NAME) {
+                                // Adiciona apenas as palavras pertencentes
+                                // ao mesmo nível do objeto (nivel == 0)
+                                if(nivel == 0) {
+                                    listaPalavrasObj.add(parser.getString());
+                                }
+                            } else if (event == Event.END_OBJECT) {
+                                //Encerra apenas se for o fim do nível
+                                if (nivel == 0) {
+                                    finaliza();
+                                    return listaPalavrasObj;
+                                } else {
+                                    // Senão, reduz a variável e segue
+                                    // a leitura
+                                    nivel--;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        finaliza();
+        return null;
+    }
+    
+    
 
     public boolean localizarElemento(String elemento)
             throws FileNotFoundException, IOException {
