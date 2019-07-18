@@ -66,9 +66,9 @@ public class Controle {
         rem.remontarUnicoBloco();
 
         //Gerar mapeamentos
-        //mm.montarMapeamentos();
+        mm.montarMapeamentos();
 
         //Adaptar à notação de agregados (esquema conceitual)
-        //an.adaptarNotacaoAgregados();
+        an.adaptarNotacaoAgregados();
     }
 }

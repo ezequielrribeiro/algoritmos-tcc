@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.json.Json;
 import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
@@ -106,7 +108,7 @@ public class RemontarEstrutura {
         int i = 1;
         List<String> listaArquivos = new ArrayList<>();
         while (true) {
-            String strNomeArq = "doc" + i + ".json";
+            String strNomeArq = "artefatos-entrada/doc" + i + ".json";
             File f = new File(strNomeArq);
             if (!f.exists()) {
                 break;
@@ -307,9 +309,9 @@ public class RemontarEstrutura {
         for (ElementoBloco[] eb : avaliar) {
             // remover os nodos excedentes (convertidos em atributos mas são
             // repetidos
-            if(eb[1].getTipo() == ElementoBloco.ATRIBUTO) {
+            if (eb[1].getTipo() == ElementoBloco.ATRIBUTO) {
                 eb[0].apagaBlocoFilho(eb[1]);
-            } else if(eb[1].getNomeConsolidado().equalsIgnoreCase(eb[0].getNomeConsolidado())) {
+            } else if (eb[1].getNomeConsolidado().equalsIgnoreCase(eb[0].getNomeConsolidado())) {
                 // filhos com o mesmo nome do pai
                 // Transferência para o pai dos filhos do filho
                 List<ElementoBloco> tFilhos = eb[1].getBlocoFilho();
@@ -320,9 +322,30 @@ public class RemontarEstrutura {
             } else {
                 // renomear os casos de filhos que tenham filhos consolidados
                 Random gera = new Random();
-                eb[1].setNomeConsolidado("e_"+gera.nextInt());
+                eb[1].setNomeConsolidado("e_" + gera.nextInt());
             }
         }
+
+        // Adicionar todos os termos consolidados que não estejam na estrutura
+        // formada em um nó anexado à raiz
+        // Criação do nó
+        Random gera = new Random();
+        ElementoBloco extra = new ElementoBloco("e_" + gera.nextInt(),
+                ElementoBloco.OBJETO);
+        for (List<ElementoBloco> bloco : listaConsolidada) {
+            for (ElementoBloco elem : bloco) {
+                // Verifica se não está na lista de palavras utilizadas 
+                if (!estaNaLista(elem.getNome(), visitadosConsolidados)) {
+                    elem.setTipo(ElementoBloco.ATRIBUTO);
+                    //Não incluir bloco raiz
+                    if (!elem.getNome().equalsIgnoreCase(raiz.getNome())) {
+                        extra.addBlocoFilho(elem);
+                    }
+                }
+            }
+        }
+        //Anexa ao nodo raiz
+        raiz.addBlocoFilho(extra);
     }
 
     private String getTermoConsolidado(String entrada,
@@ -375,24 +398,30 @@ public class RemontarEstrutura {
         return false;
     }
 
-    public void remontarPorBlocos() throws FileNotFoundException, IOException {
-        //Carrega os artefatos de entrada
-        ListasDAO l = new ListasDAO();
-        //Lista de referencias 1
-        List<List<String>> listaRef1 = l.lerListaReferencias1();
-        //Lista de referencias 2
-        List<String[]> listaRef2 = l.lerListaReferencias2();
-        //Configuracoes especialista
-        List<List<String>> listaEspecialista = l.lerListaEspecialista();
-        //Lista de campos consolidados
-        List<List<ElementoBloco>> blocosCamposConsolidados = l.lerListaCamposConsolidados();
-
-        // Remonta a estrutura
-        List<ElementoBloco> blocoPrincipal = remontarPorBlocos(blocosCamposConsolidados, listaRef2, listaRef1, listaEspecialista);
-
-        // Grava a estrutura em arquivo, como estrutura consolidada
-        EstruturaConsolidadaDAO est = new EstruturaConsolidadaDAO();
-        est.gravarEstruturaConsolidada(blocoPrincipal);
+    public void remontarPorBlocos() {
+        try {
+            //Carrega os artefatos de entrada
+            ListasDAO l = new ListasDAO();
+            //Lista de referencias 1
+            List<List<String>> listaRef1 = l.lerListaReferencias1();
+            //Lista de referencias 2
+            List<String[]> listaRef2 = l.lerListaReferencias2();
+            //Configuracoes especialista
+            List<List<String>> listaEspecialista = l.lerListaEspecialista();
+            //Lista de campos consolidados
+            List<List<ElementoBloco>> blocosCamposConsolidados = l.lerListaCamposConsolidados();
+            
+            // Remonta a estrutura
+            List<ElementoBloco> blocoPrincipal = remontarPorBlocos(blocosCamposConsolidados, listaRef2, listaRef1, listaEspecialista);
+            
+            // Grava a estrutura em arquivo, como estrutura consolidada
+            EstruturaConsolidadaDAO est = new EstruturaConsolidadaDAO();
+            est.gravarEstruturaConsolidada(blocoPrincipal);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(RemontarEstrutura.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(RemontarEstrutura.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private List<ElementoBloco> remontarPorBlocos(
@@ -460,7 +489,7 @@ public class RemontarEstrutura {
         int tipoDado = 0;
         List<String> documentos = listaEspecialista.get(numeroBloco);
         for (String documento : documentos) {
-            InfoJSON info = new InfoJSON(documento);
+            InfoJSON info = new InfoJSON("artefatos-entrada/"+documento);
             tipoDado = info.getTipoElemento(nomeElem);
             if (tipoDado != InfoJSON.T_NADA) {
                 return tipoDado;
@@ -476,7 +505,7 @@ public class RemontarEstrutura {
             List<List<String>> listaRef1) throws FileNotFoundException, IOException {
         for (List<String> referencia : listaRef1) {
             if (referencia.get(0).equalsIgnoreCase(nomeElem)) {
-                InfoJSON info = new InfoJSON(referencia.get(1));
+                InfoJSON info = new InfoJSON("artefatos-entrada/"+referencia.get(1));
                 int tipo = info.getTipoElemento(nomeElem);
                 return tipo;
             }

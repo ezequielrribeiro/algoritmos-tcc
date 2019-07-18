@@ -121,7 +121,7 @@ public class NodoEstruturaConsolidada {
 
     @Override
     public String toString() {
-        if (this.atributos.get(0).equalsIgnoreCase("att")) {
+        if (!this.atributos.isEmpty() && this.atributos.get(0).equalsIgnoreCase("att")) {
             return "";
         }
 

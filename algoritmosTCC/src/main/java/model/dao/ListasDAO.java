@@ -31,7 +31,7 @@ public class ListasDAO {
      */
     public List<List<ElementoBloco>> lerListaCamposConsolidados()
             throws FileNotFoundException {
-        String arquivo = "campos-consolidados.csv";
+        String arquivo = "artefatos-saida/campos-consolidados.csv";
         List<List<ElementoBloco>> listaCamposConsolidados = new ArrayList<>();
         List<ElementoBloco> l;
         Scanner scanner = new Scanner(new FileReader(arquivo))
@@ -53,7 +53,7 @@ public class ListasDAO {
     
     public void gravarListaCamposConsolidados(List<List<String>> 
             listaCamposConsolidados) throws IOException {
-        FileWriter arq = new FileWriter("campos-consolidados.csv");
+        FileWriter arq = new FileWriter("artefatos-saida/campos-consolidados.csv");
         PrintWriter gravarArq = new PrintWriter(arq);
         for(List<String> linha : listaCamposConsolidados) {
             for(int i = 0; i < linha.size(); i++) {
@@ -75,7 +75,7 @@ public class ListasDAO {
      */
     public List<List<String>> lerListaReferencias1()
             throws FileNotFoundException {
-        String arquivo = "lista-referencias-1.csv";
+        String arquivo = "artefatos-entrada/lista-referencias-1.csv";
         List<List<String>> listaReferencias = new ArrayList<>();
         List<String> l;
         Scanner scanner = new Scanner(new FileReader(arquivo))
@@ -99,7 +99,7 @@ public class ListasDAO {
      */
     public List<String[]> lerListaReferencias2()
             throws FileNotFoundException {
-        String arquivo = "lista-referencias-2.csv";
+        String arquivo = "artefatos-saida/lista-referencias-2.csv";
         List<String[]> listaReferencias = new ArrayList<>();
         Scanner scanner = new Scanner(new FileReader(arquivo))
                 .useDelimiter("\\;|\\n");
@@ -120,7 +120,7 @@ public class ListasDAO {
      * (lista-referencias-2.csv)
      */
     public void gravarListaReferencias2(List<String[]> listaReferencias2) throws IOException {
-        FileWriter arq = new FileWriter("lista-referencias-2.csv");
+        FileWriter arq = new FileWriter("artefatos-saida/lista-referencias-2.csv");
         PrintWriter gravarArq = new PrintWriter(arq);
         for(String[] referencia : listaReferencias2) {
             gravarArq.println(referencia[0]+";"+referencia[1]);
@@ -134,7 +134,7 @@ public class ListasDAO {
      * (lista-referencias-2.csv)
      */
     public void gravarMapeamentos(List<String[]> mapeamentos) throws IOException {
-        FileWriter arq = new FileWriter("mapeamentos.csv");
+        FileWriter arq = new FileWriter("artefatos-saida/mapeamentos.csv");
         PrintWriter gravarArq = new PrintWriter(arq);
         for(String[] mapeamento : mapeamentos) {
             gravarArq.println(mapeamento[0]+";"+mapeamento[1]+";"+mapeamento[2]);
@@ -150,7 +150,7 @@ public class ListasDAO {
      */
     public List<List<String>> lerListaEspecialista() 
             throws FileNotFoundException {
-        String arquivo = "lista-especialista.csv";
+        String arquivo = "artefatos-entrada/lista-especialista.csv";
         List<List<String>> listaEspecialista = new ArrayList<>();
         List<String> l;
         Scanner scanner = new Scanner(new FileReader(arquivo))

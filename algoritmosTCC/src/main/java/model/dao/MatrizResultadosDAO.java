@@ -21,8 +21,8 @@ public class MatrizResultadosDAO {
 
     public MatrizResultados lerMatrizUnicaResultados()
             throws FileNotFoundException {
-        return lerMatrizUnicaResultados("matriz-unica-resultados-campos.csv",
-                "matriz-unica-resultados.csv");
+        return lerMatrizUnicaResultados("artefatos-entrada/matriz-unica-resultados-campos.csv",
+                "artefatos-entrada/matriz-unica-resultados.csv");
     }
 
     public List<MatrizResultados> lerMatrizUnicaResultadosBlocos()
@@ -30,12 +30,13 @@ public class MatrizResultadosDAO {
         List<MatrizResultados> blocos = new ArrayList<>(0);
         int i = 0;
         while (true) {
-            File f = new File("matriz-unica-resultados-campos-" + i + ".csv");
+            File f = new File("artefatos-entrada/matriz-unica-resultados-campos-" + i + ".csv");
             if (!f.exists()) {
                 break;
             }
-            MatrizResultados t = lerMatrizUnicaResultados("matriz-unica-resultados-campos-" + i + ".csv",
-                    "matriz-unica-resultados-" + i + ".csv");
+            MatrizResultados t = lerMatrizUnicaResultados("artefatos-entrada/"
+                    + "matriz-unica-resultados-campos-" + i + ".csv",
+                    "artefatos-entrada/matriz-unica-resultados-" + i + ".csv");
             blocos.add(t);
             i++;
         }

@@ -24,7 +24,7 @@ public class EstruturaConsolidadaDAO {
     
     public NodoEstruturaConsolidada lerEstruturaConsolidada() 
             throws FileNotFoundException, IOException, Exception {
-        String nomeArquivo = "estrutura-consolidada.txt";
+        String nomeArquivo = "artefatos-saida/estrutura-consolidada.txt";
         ParserEstruturaConsolidada notacoes = new ParserEstruturaConsolidada();
         FileReader arq = new FileReader(nomeArquivo);
         BufferedReader lerArq = new BufferedReader(arq);
@@ -44,7 +44,7 @@ public class EstruturaConsolidadaDAO {
      * @throws java.io.IOException
      */
     public void gravarEstruturaConsolidada(List<ElementoBloco> elementos) throws IOException {
-        FileWriter arq = new FileWriter("estrutura-consolidada.txt");
+        FileWriter arq = new FileWriter("artefatos-saida/estrutura-consolidada.txt");
         PrintWriter gravarArq = new PrintWriter(arq);
         gravarArq.println(getStringEstruturaConsolidada(elementos));
         gravarArq.close();
@@ -52,7 +52,7 @@ public class EstruturaConsolidadaDAO {
     }
     
     public void gravarEstruturaConsolidada(ElementoBloco elemento) throws IOException {
-        FileWriter arq = new FileWriter("estrutura-consolidada.txt");
+        FileWriter arq = new FileWriter("artefatos-saida/estrutura-consolidada.txt");
         PrintWriter gravarArq = new PrintWriter(arq);
         gravarArq.println(getStringEstruturaConsolidada(elemento));
         gravarArq.close();
@@ -78,7 +78,7 @@ public class EstruturaConsolidadaDAO {
      */
     public void gravarEsquemaConceitual(NodoEstruturaConsolidada estrutura) 
             throws IOException {
-        FileWriter arq = new FileWriter("esquema-conceitual.txt");
+        FileWriter arq = new FileWriter("artefatos-saida/esquema-conceitual.txt");
         PrintWriter gravarArq = new PrintWriter(arq);
         gravarArq.println(estrutura.toString());
         gravarArq.close();
