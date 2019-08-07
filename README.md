@@ -8,3 +8,7 @@ Estrutura de diretórios:<br>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- /artefatos-saida<br>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- /src<br>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- /target<br>
+A pasta "artefatos-entrada" possui os documentos de entrada a serem processados (ver trabalho em <a href="">link</a>)
+A pasta "artefatos-saida" possui os documentos de entrada após serem processados (ver trabalho em <a href="">link</a>)
+A pasta "src" possui arquivos-fonte do projeto
+A pasta "Target" possui os executáveis.
